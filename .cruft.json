@@ -1,0 +1,28 @@
+{
+  "template": "git@github.com:Mr-Pepe/python-template.git",
+  "commit": "cb8d22c0907592043e5350bc7477a33d2353e472",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "full_name": "Frito",
+      "email": "fritogotlayed@gmail.com",
+      "github_user": "fritogotlayed",
+      "project_name": "Computer Stats Daemon",
+      "repo_name": "computer-stats-daemon",
+      "package_name": "computer-stats-daemon",
+      "import_name": "computer_stats_daemon",
+      "project_short_description": "Project to collect and emit computer stats for a Raspberry Pi project.",
+      "url": "https://github.com/fritogotlayed/computer-stats-daemon",
+      "_debug": "False",
+      "_extensions": [
+        "extensions.git_extension.GitExtension"
+      ],
+      "_copy_without_render": [
+        "docs/_templates/license_compliance.rst.j2",
+        "jreleaser.yml"
+      ],
+      "_template": "git@github.com:Mr-Pepe/python-template.git"
+    }
+  },
+  "directory": null
+}
