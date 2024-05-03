@@ -4,6 +4,7 @@ from importlib_metadata import PackageNotFoundError as _PackageNotFoundError
 from importlib_metadata import version as _version
 
 __module_name__ = "computer_stats_daemon"
+VERSION = "0.0.1"
 
 try:  # pragma: no cover
     __version__ = _version(__module_name__)

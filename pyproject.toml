@@ -5,17 +5,26 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "computer-stats-daemon"
 authors = [
-    {name = "Frito", email = "fritogotlayed@gmail.com}"},
+    { name = "Frito", email = "fritogotlayed@gmail.com}" },
 ]
 description = "Project to collect and emit computer stats for a Raspberry Pi project."
 readme = "README.rst"
 urls.Homepage = "https://github.com/fritogotlayed/computer-stats-daemon"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dynamic = ["version"]
 dependencies = [
-    "importlib-metadata",
     # Add runtime dependencies here
+    "importlib-metadata",
+    "psutil",
+    "flask",
+    "Flask-SocketIO",
+    "websocket-client"
 ]
+
+[project.scripts]
+computer-stats = "computer_stats_daemon.presentation.main:cli_entrypoint"
+computer-stats-daemon = "computer_stats_daemon.presentation.collector:start_collector"
+computer-stats-dashboard = "computer_stats_daemon.presentation.dashboard:cli_entrypoint"
 
 [project.optional-dependencies]
 dev = [
@@ -86,6 +95,9 @@ build-template = [
 # Enables the usage of setuptools_scm
 [tool.setuptools_scm]
 
+[tool.setuptools.dynamic]
+version = { attr = "computer_stats_daemon.VERSION" }
+
 
 [tool.pyright]
 exclude = ["build/**"]
@@ -99,13 +111,13 @@ extend-exclude = [
 target-version = "py38"
 select = ["ALL"]
 ignore = [
-    "COM812",   # Conflicts with the formatter
-    "ISC001",   # Conflicts with the formatter
-    "ANN101",   # "missing-type-self"
-    "PT001",    # https://github.com/astral-sh/ruff/issues/8796#issuecomment-1825907715
-    "PT004",    # https://github.com/astral-sh/ruff/issues/8796#issuecomment-1825907715
-    "PT005",    # https://github.com/astral-sh/ruff/issues/8796#issuecomment-1825907715
-    "PT023",    # https://github.com/astral-sh/ruff/issues/8796#issuecomment-1825907715
+    "COM812", # Conflicts with the formatter
+    "ISC001", # Conflicts with the formatter
+    "ANN101", # "missing-type-self"
+    "PT001", # https://github.com/astral-sh/ruff/issues/8796#issuecomment-1825907715
+    "PT004", # https://github.com/astral-sh/ruff/issues/8796#issuecomment-1825907715
+    "PT005", # https://github.com/astral-sh/ruff/issues/8796#issuecomment-1825907715
+    "PT023", # https://github.com/astral-sh/ruff/issues/8796#issuecomment-1825907715
 ]
 
 [tool.ruff.per-file-ignores]
@@ -118,7 +130,7 @@ ignore = [
     "F403", # Wildcard imports
 ]
 "docs/**" = [
-    "INP001",   # Requires __init__.py but docs folder is not a package.
+    "INP001", # Requires __init__.py but docs folder is not a package.
 ]
 
 [tool.ruff.lint.pyupgrade]
@@ -138,7 +150,7 @@ exclude = [
     "log/",
     "build/",
     "dist/"
-    ]
+]
 
 [tool.pytest.ini_options]
 addopts = """
@@ -163,11 +175,11 @@ source = ["src/", ".tox/*/lib/python*/site-packages/"]
 exclude_also = [
     "\\.\\.\\.",
     "if TYPE_CHECKING:"
-    ]
+]
 partial_branches = [
     "pragma: no branch",
     "if not TYPE_CHECKING:"
-    ]
+]
 
 [tool.coverage.html]
 directory = "reports/coverage_html"
@@ -179,5 +191,5 @@ output = "reports/coverage.xml"
 module = [
     # Ignore packages that do not provide type hints here
     # For example, add "dash.*" to ignore all imports from Dash
-    ]
+]
 ignore_missing_imports = true
