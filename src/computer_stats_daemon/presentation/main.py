@@ -118,7 +118,7 @@ def cli_entrypoint() -> None:
             cli_start_daemon(Service.COLLECTOR)
     elif args.service == Service.DASHBOARD:
         if args.interactive:
-            start_dashboard(logging.DEBUG if args.debug else logging.INFO)
+            start_dashboard(logging.DEBUG if args.debug else logging.INFO, interactive=True)
         elif args.stop:
             cli_stop_daemon(Service.DASHBOARD)
         else:

@@ -16,7 +16,7 @@
 </head>
 <body>
 <!-- https://getbootstrap.com/docs/5.3/examples/album/ -->
-<div id="root"></div>
+<div id="root" style="height: 100%"></div>
 <script type="text/babel">
 
     function CreateGuage(targetId) {
@@ -70,7 +70,7 @@
         }, []);
 
         return <div className="col">
-            <div className="card shadow-sm">
+            <div className="card text-bg-secondary shadow-sm">
                 <canvas id={gaugeElementId}></canvas>
                 <div className="card-body">
                     <p id={gaugeLabelElementId} className="card-text text-center">{props.label}</p>
@@ -79,12 +79,16 @@
         </div>
     }
 
+    const pageStyle = {
+        height: '100%'
+    }
+
     function MyApp() {
-        return <div>
-            <h1>Computer Stats</h1>
-            <div className="album py-5 bg-body-tertiary">
+        return <div className="bg-dark" style={pageStyle}>
+            <h1 className="text-bg-dark">Computer Stats</h1>
+            <div className="album py-5">
                 <div className="container">
-                    <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                    <div className="row row-cols-2">
                         <GuagePanel label="CPU Usage" dataKey="cpu"/>
                         <GuagePanel label="Memory Usage" dataKey="memory"/>
                     </div>

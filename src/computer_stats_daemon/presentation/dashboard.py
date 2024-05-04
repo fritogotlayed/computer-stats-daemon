@@ -13,8 +13,9 @@ async_mode = None
 app = Flask(__name__, template_folder=".")
 socket_ = SocketIO(app, async_mode=async_mode)
 
-log = logging.getLogger("werkzeug")
-log.setLevel(logging.ERROR)
+
+# log = logging.getLogger("werkzeug")
+# log.setLevel(logging.ERROR)
 
 
 # https://medium.com/swlh/implement-a-websocket-using-flask-and-socket-io-python-76afa5bbeae1
@@ -33,10 +34,10 @@ def stats_update(message: any) -> None:
     emit("stats_update", message, broadcast=True)
 
 
-def start_dashboard(log_level: int | str = logging.INFO) -> None:
+def start_dashboard(log_level: int | str = logging.INFO, interactive: bool = False) -> None:
     """Start the dashboard."""
     setup_logging(log_level)
-    socket_.run(app, debug=False, port=PORT, allow_unsafe_werkzeug=True)
+    socket_.run(app, debug=interactive, port=PORT, allow_unsafe_werkzeug=True)
 
 
 def cli_entrypoint() -> None:
