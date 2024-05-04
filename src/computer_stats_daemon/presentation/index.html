@@ -1,7 +1,7 @@
 <html lang="en">
 <head>
     <title>Computer Stats</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    <link href="//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
@@ -10,60 +10,42 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
+    <script src="//unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="//unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="//unpkg.com/babel-standalone/babel.min.js"></script>
 </head>
 <body>
 <!-- https://getbootstrap.com/docs/5.3/examples/album/ -->
-<h1>Computer Stats</h1>
-<div class="album py-5 bg-body-tertiary">
-    <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-            <div class="col">
-                <div class="card shadow-sm">
-                    <canvas id='cpu-gauge'></canvas>
-                    <div class="card-body">
-                        <p id='cpu-label' class="card-text text-center">CPU Usage (0.0%)</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card shadow-sm">
-                    <canvas id='mem-gauge'></canvas>
-                    <div class="card-body">
-                        <p id='mem-label' class="card-text text-center">Memory Usage (0.0%)</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-    var opts = {
-        angle: 0,
-        lineWidth: 0.3,
-        radiusScale: 1,
-        pointer: {length: 0.6, strokeWidth: 0.035, color: '#000000'},
-        staticZones: [
-            {strokeStyle: '#30B32D', min: 0, max: 70},
-            {strokeStyle: '#FFDD00', min: 70, max: 85},
-            {strokeStyle: '#F03E3E', min: 85, max: 100}
-        ],
-        limitMax: true,
-        limitMin: true,
-        highDpiSupport: true,
-        renderTicks: {
-            divisions: 10,
-            divWidth: 1.1,
-            divLength: 0.7,
-            divColor: '#333333',
-            subDivisions: 2,
-            subLength: 0.5,
-            subWidth: 0.6,
-            subColor: '#666666'
-        }
-    };
+<div id="root"></div>
+<script type="text/babel">
 
-    const createGuage = (elementId) => {
-        var target = document.getElementById(elementId);
+    function CreateGuage(targetId) {
+        var opts = {
+            angle: 0,
+            lineWidth: 0.3,
+            radiusScale: 1,
+            pointer: {length: 0.6, strokeWidth: 0.035, color: '#000000'},
+            staticZones: [
+                {strokeStyle: '#30B32D', min: 0, max: 70},
+                {strokeStyle: '#FFDD00', min: 70, max: 85},
+                {strokeStyle: '#F03E3E', min: 85, max: 100}
+            ],
+            limitMax: true,
+            limitMin: true,
+            highDpiSupport: true,
+            renderTicks: {
+                divisions: 10,
+                divWidth: 1.1,
+                divLength: 0.7,
+                divColor: '#333333',
+                subDivisions: 2,
+                subLength: 0.5,
+                subWidth: 0.6,
+                subColor: '#666666'
+            }
+        };
+
+        var target = document.getElementById(targetId);
         var gauge = new Gauge(target).setOptions(opts);
         gauge.maxValue = 100;
         gauge.setMinValue(0);
@@ -72,28 +54,49 @@
         return gauge;
     }
 
-    const cpuGauge = createGuage('cpu-gauge');
-    const memGauge = createGuage('mem-gauge');
+    function GuagePanel(props) {
+        const gaugeElementId = props.label.toLowerCase().replace('_', '-').replace(' ', '-');
+        const gaugeLabelElementId = `${gaugeElementId}-label`;
 
-    // Set up the WebSocket connection
-    var socket = io('ws://localhost:8889');
-    // socket.addEventListener('open', function (event) {
-    //     console.log('Connected to the server');
-    // });
-    // socket.addEventListener('close', function (event) {
-    //     console.log('Disconnected from the server');
-    // });
-    // socket.addEventListener('message', function (event) {
-    // });
-    socket.on('stats_update', function (msg, cb) {
-        console.log(msg);
-        const data = JSON.parse(msg);
-        cpuGauge.set(data.cpu);
-        memGauge.set(data.memory);
+        React.useEffect(() => {
+            const socket = io('ws://localhost:8889');
+            console.log('Creating guage')
+            const gauge = CreateGuage(gaugeElementId);
+            socket.on('stats_update', function (msg) {
+                const data = JSON.parse(msg);
+                gauge.set(data[props.dataKey]);
+                document.getElementById(gaugeLabelElementId).innerText = `${props.label} (${data[props.dataKey]}%)`;
+            });
+        }, []);
 
-        document.getElementById('cpu-label').innerText = `CPU Usage (${data.cpu}%)`;
-        document.getElementById('mem-label').innerText = `Memory Usage (${data.memory}%)`;
-    })
+        return <div className="col">
+            <div className="card shadow-sm">
+                <canvas id={gaugeElementId}></canvas>
+                <div className="card-body">
+                    <p id={gaugeLabelElementId} className="card-text text-center">{props.label}</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    function MyApp() {
+        return <div>
+            <h1>Computer Stats</h1>
+            <div className="album py-5 bg-body-tertiary">
+                <div className="container">
+                    <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                        <GuagePanel label="CPU Usage" dataKey="cpu"/>
+                        <GuagePanel label="Memory Usage" dataKey="memory"/>
+                    </div>
+                </div>
+            </div>
+        </div>;
+    }
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<MyApp/>);
+
 </script>
 </body>
 </html>
